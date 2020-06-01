@@ -13,20 +13,32 @@ sos4py
         :target: https://sos4py.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
-
-
-sos4py is a convenience layer for Python environment to access services, extract data, and allow querying from SOS instances.
-
+sos4py is a convenience layer for Python environment to access services, extract data, and allow querying from SOS instances. It extends the functions of the owslib package, by creating deeper abstractions of summary requests, and implementing the Get Data Availability function of the SOS.
 
 * Free software: Apache Software License 2.0
 * Documentation: https://sos4py.readthedocs.io.
 
+Installation
+-----------
+$ pip install sos4py
 
-Features
---------
+Requirements: There is dependency to other packages.
 
-* TODO
+owslib
+
+pandas
+
+inspect
+
+etree
+
+These dependencies will be automatically installed when sos4py is installed.
+
+
+Development
+-----------
+sos4py is developed on GitHub using the fork & pull development model. The main repository’s issue tracker is used to coordinate development.
+
 
 Credits
 -------
