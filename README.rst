@@ -18,6 +18,22 @@ sos4py is a convenience layer for Python environment to access services, extract
 * Free software: Apache Software License 2.0
 * Documentation: https://sos4py.readthedocs.io.
 
+Installation
+-----------
+$ pip install sos4py
+
+Requirements: There is dependency to other packages.
+
+owslib
+
+pandas
+
+inspect
+
+etree
+
+These dependencies will be automatically installed when sos4py is installed.
+
 
 Development
 -----------
