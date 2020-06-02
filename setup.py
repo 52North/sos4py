@@ -31,7 +31,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="sos4py is a convenience layer for Python environment to access services, extract data, and allow querying from SOS instances.",
+    description="sos4py is a convenience layer for Python environment to access services from SOS instances.",
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme + '\n\n' + history,
