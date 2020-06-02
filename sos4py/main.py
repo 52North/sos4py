@@ -13,7 +13,7 @@
 from owslib.util import clean_ows_url
 from .sos_2_0_0 import sos_2_0_0
 
-def sos4py(url,
+def connection_sos(url,
              xml=None,
              username=None,
              password=None,):
