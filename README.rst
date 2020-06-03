@@ -111,7 +111,7 @@ Usage
  *Parameters*
 
     object : str
-      Xml file path.
+      Object of type sos_2_0_0.
 
     procedures : list of str
       Query the data based on the availability of the indicated procedures.
