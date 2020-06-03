@@ -13,6 +13,7 @@ To install sos4py, run this command in your terminal:
 .. code-block:: console
 
     $ pip install sos4py
+    $ pip install sos4py==0.1.0
 
 This is the preferred method to install sos4py, as it will always install the most recent stable release.
 
