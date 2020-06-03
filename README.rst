@@ -18,22 +18,9 @@ Features
 --------
 *   Allows connection to an SOS service using OWSLib.
 
-    * These indentation requirements are the same for sub-list items
-          (but apply to their symbol or number, not their item text).
+*   Explore and summarize service capabilities, sensor metadata, offerings, observed properties, and available phenomena.
 
-    *   A.
-
-        + If you *do* use them (for items with sub-lists or extra
-          paragraphs) put blank lines between *all* items at that level.
-
-* TODO
-
-Installation
-------------
-#. `pip install project-name`
-#. Add `'project_name.middleware.ProjectNameMiddleware'` to `MIDDLEWARE_CLASSES` (if necessary)
-#. Add `'project_name'` to `INSTALLED_APPS` (if necessary)
-#. Run `syncdb` (if necessary)
+*   Query requests to an SOS service for Get Data Availability.
 
 
 Usage
@@ -67,7 +54,7 @@ Usage
 
 **Get capabilities functions(summaries):**
  *Description*
-  Construction class sos_2_0_0. Implements the the return of the function *connection_sos()* as inpu. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
+  Construction class sos_2_0_0. Implements the the return of the function *connection_sos()* as input. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
 
  *Usage*
      ``class sos_2_0_0(self, url, version, xml=None, username=None, password=None):``
@@ -110,8 +97,8 @@ Usage
       
  *Parameters*
 
-    object : sos_2_0_0()
-      Object of class type sos_2_0_0.
+    object : str
+      Xml file path.
 
     procedures : list of str
       Query the data based on the availability of the indicated procedures.
@@ -132,7 +119,7 @@ Usage
  *Examples*
 
       ``service.get_data_availability()``
-
+      ``service.get_data_availability()``
 
 
       ``service.get_data_availability(procedures=['http://www.52north.org/test/procedure/6'], 
