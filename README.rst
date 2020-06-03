@@ -106,7 +106,7 @@ Usage
 
  *Usage*
 
-   ``def get_data_availability(object, procedures=None, observedProperties=None, featuresOfInterest=None, offerings=None, method=None, **kwargs)``
+ ``def get_data_availability(object, procedures=None, observedProperties=None, featuresOfInterest=None, offerings=None, method=None, **kwargs)``
       
  *Parameters*
 
