@@ -110,8 +110,8 @@ Usage
       
  *Parameters*
 
-    object : str
-      Object of type sos_2_0_0.
+    object : sos_2_0_0()
+      Object of class type sos_2_0_0.
 
     procedures : list of str
       Query the data based on the availability of the indicated procedures.
