@@ -132,7 +132,7 @@ Usage
  *Examples*
 
       ``service.get_data_availability()``
-      ``service.get_data_availability()``
+
 
 
       ``service.get_data_availability(procedures=['http://www.52north.org/test/procedure/6'], 
