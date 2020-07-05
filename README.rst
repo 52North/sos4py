@@ -25,6 +25,8 @@ Features
 Usage
 -----
 
+**AN EXAMPLE OF THE PACKAGE CAN BE SEEN:**: https://github.com/alchav06/sos4py/blob/master/demo_sos4py.ipynb
+
 **Connecting to an SOS service:**
  *Description*
   Base class of a connection to a Sensor Observation Service. The result is class object SensorObservationService_2_0_0(object) of the OWSLib (<https://github.com/geopython/OWSLib/blob/master/owslib/swe/observation/sos200.py>)
