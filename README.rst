@@ -11,7 +11,6 @@ sos4py is a convenience layer for Python environment to access services, extract
 
 
 * Free software: Apache Software License 2.0
-* Documentation: https://sos4py.readthedocs.io.
 
 
 Features
