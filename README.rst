@@ -74,7 +74,7 @@ Usage
 
     ``from sos4py.main import connection_sos``
     
-    ``service = sos4py('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
+    ``service = connection_sos('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
 
     ``service.sosServiceIdentification()``
 
