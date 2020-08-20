@@ -154,20 +154,25 @@ Usage
       ``service.get_feature_of_interest(featureOfInterest='foi_name')``
       
       
-      ```
-      from owslib.etree import etree
-      from sos4py.main import connection_sos
-      from sos4py.sos_2_0_0 import SOSGetFeatureOfInterestResponse
+      ``from owslib.etree import etree``
+      
+      ``from sos4py.main import connection_sos``
+      
+      ``from sos4py.sos_2_0_0 import SOSGetFeatureOfInterestResponse``
+      
         
-      service = connection_sos("https://fluggs.wupperverband.de/sos2/service")
+      ``service = connection_sos("https://fluggs.wupperverband.de/sos2/service")``
       
-      response = service.get_feature_of_interest()
-      xml_tree = etree.fromstring(response)
-      parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)
+      ``response = service.get_feature_of_interest()``
       
-      name = parsed_response.features[0].name
-      geometry = parsed_response.features[0].get_geometry()
-      ```
+      ``xml_tree = etree.fromstring(response)``
+      
+      ``parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)``
+      
+      ``name = parsed_response.features[0].name``
+      
+      ``geometry = parsed_response.features[0].get_geometry()``
+      
       
 
 Credits
