@@ -42,9 +42,9 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/alchav06/sos4py',
-    download_url='https://github.com/alchav06/sos4py/archive/v_0.1.0.tar.gz',
+    url='https://github.com/52North/sos4py',
+    download_url='https://github.com/52North/sos4py/archive/v0.2.0.tar.gz',
     version='0.2.0',
     zip_safe=False,
-    
+
 )
