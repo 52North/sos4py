@@ -21,11 +21,12 @@ Features
 
 *   Query requests to an SOS service for Get Data Availability.
 
+*   Query requests to an SOS service for Get Feature of Interest.
 
 Usage
 -----
 
-**AN EXAMPLE OF THE PACKAGE CAN BE SEEN:**: https://github.com/alchav06/sos4py/blob/master/demo_sos4py.ipynb
+**EXAMPLES OF THE PACKAGE CAN BE SEEN:**: https://github.com/52North/sos4py/tree/master/examples
 
 **Connecting to an SOS service:**
  *Description*
@@ -53,7 +54,7 @@ Usage
     
     ``service = sos4py('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
 
-**Get capabilities functions(summaries):**
+**Get capabilities functions (summaries):**
  *Description*
   Construction class sos_2_0_0. Implements the the return of the function *connection_sos()* as input. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
 
@@ -120,12 +121,54 @@ Usage
  *Examples*
 
       ``service.get_data_availability()``
-      ``service.get_data_availability()``
 
 
       ``service.get_data_availability(procedures=['http://www.52north.org/test/procedure/6'], 
       featuresOfInterest=['http://www.52north.org/test/featureOfInterest/6'])``
 
+
+**Get Feature of Interest function:**        
+ *Description*
+  Method to retrieve feature(s) of interest from an SOS. The result is <class 'bytes'>.
+
+ *Usage*
+
+ ``def get_feature_of_interest(self, responseFormat=None, featureOfInterest=None, method=None, **kwargs)``
+      
+ *Parameters*
+
+    responseFormat : str
+      Xml schema path.
+
+    featureOfInterest : str
+      Query the data only for a specific feature of interest.
+
+    method : str
+      'Get' or 'Post' request parameter.
+
+
+ *Examples*
+
+      ``service.get_feature_of_interest()``
+      
+      ``service.get_feature_of_interest(featureOfInterest='foi_name')``
+      
+      
+      ```
+      from owslib.etree import etree
+      from sos4py.main import connection_sos
+      from sos4py.sos_2_0_0 import SOSGetFeatureOfInterestResponse
+        
+      service = connection_sos("https://fluggs.wupperverband.de/sos2/service")
+      
+      response = service.get_feature_of_interest()
+      xml_tree = etree.fromstring(response)
+      parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)
+      
+      name = parsed_response.features[0].name
+      geometry = parsed_response.features[0].get_geometry()
+      ```
+      
 
 Credits
 -------
