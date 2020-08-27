@@ -10,44 +10,29 @@
 #Class function
 # Import functions from other libraries
 from owslib.util import testXMLValue, testXMLAttribute, nspath_eval, openURL
-from owslib.swe.observation.sos200 import SosCapabilitiesReader
 from owslib.swe.observation.sos200 import SensorObservationService_2_0_0
+from owslib.swe.observation.sos200 import SOSGetObservationResponse
 from owslib.etree import etree
 from owslib import ows
 import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
+import pyproj
 import inspect
 from .util import get_namespaces, nspv, TimePeriod, parseGDAReferencedElement, gda_member, check_list_param
 
 namespaces = get_namespaces()
 
-class sos_2_0_0(object):
+class sos_2_0_0(SensorObservationService_2_0_0):
     """
         Abstraction for OGC Sensor Observation Service (SOS).
         Implements sos4py.
     """
-    def __new__(self, url, version, xml=None, username=None, password=None):
-        """overridden __new__ method"""
-        obj = object.__new__(self)
-        obj.__init__(url, version, xml, username, password)
-        return obj
 
     def __init__(self, url, version, xml=None, username=None, password=None):
         """Initialize."""
-        self.url = url
-        self.username = username
-        self.password = password
-        self.version = version
-        self._capabilities = None
 
-        reader = SosCapabilitiesReader(
-            version="2.0.0", url=self.url, username=self.username, password=self.password
-        )
-        if xml:  # read from stored xml
-            self._capabilities = reader.read_string(xml)
-        else:  # read from server
-            self._capabilities = reader.read(self.url)
-
-        SensorObservationService_2_0_0._build_metadata(self)
+        super().__init__(url=url, version="2.0.0", xml=xml, username=username, password=password)
 
     # Summary functions
     def sosServiceIdentification(self):
@@ -88,7 +73,7 @@ class sos_2_0_0(object):
         """Construction function for "GetDataAvailability" operation"""
         method = method or 'Get'
         try:
-            base_url = next((m.get('url') for m in SensorObservationService_2_0_0.getOperationByName(self,'GetDataAvailability').methods
+            base_url = next((m.get('url') for m in self.getOperationByName(self,'GetDataAvailability').methods
                             if m.get('type').lower() == method.lower()))
         except StopIteration:
             base_url = self.url
@@ -136,20 +121,45 @@ class sos_2_0_0(object):
         final = list(map(gda_member, gdaMembers))
         return(final)
 
-    def get_feature_of_interest(self, responseFormat=None, featureOfInterest=None, method=None, **kwargs):
+    def get_feature_of_interest(self, featureOfInterest=None, observedProperty=None, procedure=None, responseFormat=None,method=None, **kwargs):
+        """Performs "GetFeatureOfInterest" request
+
+        Parameters
+        ----------
+        featureOfInterest : str, optional
+           feature of interest
+        observedProperty: str, optional
+           observed property
+        procedure: str, optional
+           procedure
+        responseFormat : str
+            response format
+        method: str, optional
+           http method (default is "Get")
+
+        Returns
+        -------
+        response of the request as <class 'bytes'>
+        """
 
         method = method or 'Get'
-        methods = SensorObservationService_2_0_0.get_operation_by_name(self, 'GetFeatureOfInterest').methods
+        methods = self.get_operation_by_name('GetFeatureOfInterest').methods
         base_url = [m['url'] for m in methods if m['type'] == method][0]
 
         request = {'service': 'SOS', 'version': self.version, 'request': 'GetFeatureOfInterest'}
 
-        if responseFormat is not None:
-            request['responseFormat'] = responseFormat
-
         # Optional Fields
         if featureOfInterest is not None:
             request['featureOfInterest'] = featureOfInterest
+
+        if observedProperty is not None:
+            request['observedProperty'] = observedProperty
+
+        if procedure is not None:
+            request['procedure'] = procedure
+
+        if responseFormat is not None:
+            request['responseFormat'] = responseFormat
 
         url_kwargs = {}
         if 'timeout' in kwargs:
@@ -171,6 +181,49 @@ class sos_2_0_0(object):
             raise
         except BaseException:
             return response
+
+    def get_sites(self, include_phenomena=False):
+        """Gets the registered sites of the SOS
+
+        Parameters
+        ----------
+        include_phenomena : boolean, optional
+           whether or not flags for the existance of phenomenona (e.g. water temperature) should be included (default is False)
+
+        Returns
+        -------
+        sites as GeoDataFrame
+        """
+
+        # Get and parse response
+        response = self.get_feature_of_interest()
+        xml_tree = etree.fromstring(response)
+        parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)
+
+        # Save features of interest with their geometry in a GeoDataFrame
+        fois = []
+        points = []
+        for foi in parsed_response.features:
+            fois.append(foi.name)
+            points.append(Point(foi.get_geometry()[1],foi.get_geometry()[0])) # Point expects (x, y)
+
+        crs = pyproj.CRS.from_user_input(int(parsed_response.features[0].get_srs().split("/")[-1]))
+        sites = gpd.GeoDataFrame({'site_name': fois, 'geometry': gpd.GeoSeries(points)},  crs=crs)
+
+        # Add columns to GeoDataFrame indicating whether or not a specific phenomenon is available for a specific foi
+        if include_phenomena==True:
+            for phenomenon in self.sosPhenomena():
+                response = self.get_feature_of_interest(observedProperty=phenomenon)
+                xml_tree = etree.fromstring(response)
+                parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)
+                fois = [foi.name for foi in parsed_response.features]
+                sites_sub = pd.DataFrame({'site_name': fois, phenomenon: True})
+                sites = sites.join(sites_sub.set_index('site_name'), on='site_name')
+
+            sites = sites.fillna(False)
+
+        return sites
+
 
 class SOSGetFeatureOfInterestResponse(object):
     """ The base response type from SOS2.0. Container for OM_Observation
