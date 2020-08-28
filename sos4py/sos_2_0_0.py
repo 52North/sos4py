@@ -68,6 +68,13 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         test_observed_properties = sorted(set(test_observed_properties))
         return(test_observed_properties)
 
+    def sosFeaturesOfInterest(self):
+        get_foi = self.get_operation_by_name('GetFeatureOfInterest')
+        fois = []
+        for foi in sorted(get_foi.parameters['featureOfInterest']['values']):
+            fois.append(foi)
+        return fois
+
     # Get data availability function
     def get_data_availability(self, procedures=None, observedProperties=None, featuresOfInterest=None, offerings=None, method=None, **kwargs):
         """Construction function for "GetDataAvailability" operation"""
