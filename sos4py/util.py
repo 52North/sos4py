@@ -80,4 +80,4 @@ def check_list_param(list_param):
     correctness = (isinstance(list_param, list) and \
     len(list_param) > 0 and \
     map(lambda x: isinstance(x, str), list_param))
-    assert (correctness)
+    assert (correctness),("A non-empty list of strings is expected!")

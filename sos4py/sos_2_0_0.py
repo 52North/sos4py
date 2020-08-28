@@ -77,10 +77,29 @@ class sos_2_0_0(SensorObservationService_2_0_0):
 
     # Get data availability function
     def get_data_availability(self, procedures=None, observedProperties=None, featuresOfInterest=None, offerings=None, method=None, **kwargs):
-        """Construction function for "GetDataAvailability" operation"""
+        """Performs "GetDataAvailability" request
+
+        Parameters
+        ----------
+        procedures: non-empty list of str, optional
+           request only specific procedures
+        observedProperties: non-empty list of str, optional
+           request only specific observed properties
+        featuresOfInterest : non-empty list of str, optional
+           request only specific features of interest
+        offerings : non-empty list of str, optional
+            request only specific offerings
+        method: str, optional
+           http method (default is "Get")
+
+        Returns
+        -------
+        list of GetDataAvailability members
+        """
+
         method = method or 'Get'
         try:
-            base_url = next((m.get('url') for m in self.getOperationByName(self,'GetDataAvailability').methods
+            base_url = next((m.get('url') for m in self.getOperationByName('GetDataAvailability').methods
                             if m.get('type').lower() == method.lower()))
         except StopIteration:
             base_url = self.url
@@ -128,18 +147,18 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         final = list(map(gda_member, gdaMembers))
         return(final)
 
-    def get_feature_of_interest(self, featureOfInterest=None, observedProperty=None, procedure=None, responseFormat=None,method=None, **kwargs):
+    def get_feature_of_interest(self, featuresOfInterest=None, observedProperties=None, procedures=None, responseFormat=None, method=None, **kwargs):
         """Performs "GetFeatureOfInterest" request
 
         Parameters
         ----------
-        featureOfInterest : str, optional
-           feature of interest
-        observedProperty: str, optional
-           observed property
-        procedure: str, optional
-           procedure
-        responseFormat : str
+        featuresOfInterest : non-empty list of str, optional
+           request only specific features of interest
+        observedProperties: non-empty list of str, optional
+           request only specific observed properties
+        procedures: non-empty list of str, optional
+           request only specific procedures
+        responseFormat : str, optional
             response format
         method: str, optional
            http method (default is "Get")
@@ -156,13 +175,19 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         request = {'service': 'SOS', 'version': self.version, 'request': 'GetFeatureOfInterest'}
 
         # Optional Fields
-        if featureOfInterest is not None:
+        if featuresOfInterest is not None:
+            check_list_param(featuresOfInterest)
+            featureOfInterest = ','.join(featuresOfInterest)
             request['featureOfInterest'] = featureOfInterest
 
-        if observedProperty is not None:
+        if observedProperties is not None:
+            check_list_param(observedProperties)
+            observedProperty = ','.join(observedProperties)
             request['observedProperty'] = observedProperty
 
-        if procedure is not None:
+        if procedures is not None:
+            check_list_param(procedures)
+            procedure = ','.join(procedures)
             request['procedure'] = procedure
 
         if responseFormat is not None:
@@ -220,7 +245,7 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         # Add columns to GeoDataFrame indicating whether or not a specific phenomenon is available for a specific foi
         if include_phenomena==True:
             for phenomenon in self.sosPhenomena():
-                response = self.get_feature_of_interest(observedProperty=phenomenon)
+                response = self.get_feature_of_interest(observedProperties=[phenomenon])
                 xml_tree = etree.fromstring(response)
                 parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)
                 fois = [foi.name for foi in parsed_response.features]
