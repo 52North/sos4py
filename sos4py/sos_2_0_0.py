@@ -12,6 +12,8 @@
 from owslib.util import testXMLValue, testXMLAttribute, nspath_eval, openURL
 from owslib.swe.observation.sos200 import SensorObservationService_2_0_0
 from owslib.swe.observation.sos200 import SOSGetObservationResponse
+from owslib.swe.observation.waterml2 import MeasurementTimeseriesObservation
+from owslib.swe.observation.om import MeasurementObservation
 from owslib.etree import etree
 from owslib import ows
 import pandas as pd
@@ -256,11 +258,193 @@ class sos_2_0_0(SensorObservationService_2_0_0):
 
         return sites
 
+    def get_observation(self, responseFormat=None, offerings=None, observedProperties=None, featuresOfInterest=None, procedures=None, eventTime=None, method=None, **kwargs):
+        """Overrides parent function get_observation()
+        Performs "GetObservation" request
+
+        Parameters
+        ----------
+        responseFormat : str
+           response format, e.g. 'http://www.opengis.net/om/2.0'
+        offerings : non-empty list of str, optional
+           request only specific offerings
+        observedProperties: non-empty list of str, optional
+           request only specific observed properties
+        featuresOfInterest : non-empty list of str, optional
+           request only specific features of interest
+        procedures: non-empty list of str, optional
+           request only specific procedures
+        eventTime: str, optional
+           event time as om:resultTime, e.g. 'om:resultTime,2019-01-01T12:00:00Z/2019-01-02T12:00:00Z'
+        method: str, optional
+           http method (default is "Get")
+        **kwargs : extra arguments
+           anything else e.g. vendor specific parameters
+
+        It is recommended to provide at least one of featuresOfInterest, observedProperties, offerings or procedures. Otherwise the request may take very long.
+
+        Returns
+        -------
+        response of the request as <class 'bytes'>
+        """
+
+        method = method or 'Get'
+        # Pluck out the get observation URL for HTTP method - methods is an
+        # array of dicts
+        methods = self.get_operation_by_name('GetObservation').methods
+        base_url = [m['url'] for m in methods if m['type'] == method][0]
+
+        request = {'service': 'SOS', 'version': self.version, 'request': 'GetObservation'}
+
+        if responseFormat is not None:
+            request['responseFormat'] = responseFormat
+
+        if offerings is not None:
+            check_list_param(offerings)
+            offering = ','.join(offerings)
+            request['offering'] = offering
+
+        if observedProperties is not None:
+            check_list_param(observedProperties)
+            observedProperty = ','.join(observedProperties)
+            request['observedProperty'] = observedProperty
+
+        if featuresOfInterest is not None:
+            check_list_param(featuresOfInterest)
+            featureOfInterest = ','.join(featuresOfInterest)
+            request['featureOfInterest'] = featureOfInterest
+
+        if procedures is not None:
+            check_list_param(procedures)
+            procedure = ','.join(procedures)
+            request['procedure'] = procedure
+
+        if eventTime is not None:
+            request['temporalFilter'] = eventTime
+
+        url_kwargs = {}
+        if 'timeout' in kwargs:
+            url_kwargs['timeout'] = kwargs.pop('timeout')  # Client specified timeout value
+
+        if kwargs:
+            for kw in kwargs:
+                request[kw] = kwargs[kw]
+
+        response = openURL(base_url, request, method, username=self.username, password=self.password, **url_kwargs).read()
+
+        try:
+            tr = etree.fromstring(response)
+            if tr.tag == nspath_eval("ows:ExceptionReport", namespaces):
+                raise ows.ExceptionReport(tr)
+            else:
+                return response
+        except ows.ExceptionReport:
+            raise
+        except BaseException:
+            return response
+
+    def get_data(self, sites=None, phenomena=None, procedures=None, begin=None, end=None):
+        """Gets the observations of the SOS
+
+        Parameters
+        ----------
+        sites : non-empty list of str, optional
+           observation sites/sensor locations
+        phenomena : non-empty list of str, optional
+           phenomena, e.g. water temperature
+        procedures : non-empty list of str, optional
+           measurement procedures of the observation, e.g. measurements in 2 m water depth
+        begin : str, optional if end is not provided
+           begin of time period in the form 'YYYY-MM-DDThh:mm:ssZ', e.g. '2020-01-01T10:00:00Z'
+        end : str, optional if begin is not provided
+           end of time period in the form 'YYYY-MM-DDThh:mm:ssZ', e.g. '2020-01-02T10:00:00Z'
+
+        It is recommended to provide at least one of sites, phenomena or procedures. Otherwise the request may take very long.
+
+        Returns
+        -------
+        observations as DataFrame
+        """
+
+        # Set event time
+        # TODO: Improve (check format, support different formats, support using only end or begin)
+        assert ((begin is not None) and (end is not None) or (begin is None) and (end is None)),("If begin/end is provided, end/begin has to be provided as well!")
+        if (begin is not None) and (end is not None):
+            eventTime = 'om:resultTime,' + begin + '/' + end
+        else:
+            eventTime = None
+
+        # Get and parse response
+        response = self.get_observation(featuresOfInterest=sites, observedProperties=phenomena, procedures=procedures, eventTime=eventTime)
+        xml_tree = etree.fromstring(response)
+        parsed_response = SOSGetObservationResponse(xml_tree)
+
+        # Check response format
+        # TODO: Check if different observations can have different response formats. If yes, the format needs to be checked for each observation...
+        if isinstance(parsed_response.observations[0], MeasurementObservation):
+            response_format = 'http://www.opengis.net/om/2.0'
+        elif isinstance(parsed_response.observations[0], MeasurementTimeseriesObservation):
+            response_format = 'http://www.opengis.net/waterml/2.0'
+
+        return self._create_obs_data_frame(parsed_response, response_format)
+
+    def _create_obs_data_frame(self, parsed_response=None, response_format=None):
+
+        assert (response_format is not None),("Unknown response format.")
+        if response_format == 'http://www.opengis.net/om/2.0':
+            return self._create_df_om(parsed_response)
+        elif response_format == 'http://www.opengis.net/waterml/2.0':
+            return self._create_df_waterml(parsed_response)
+
+    def _create_df_om(self, parsed_response):
+        """
+        Save observation data in a DataFrame using response format http://www.opengis.net/om/2.0
+        """
+
+        fois = []
+        procedures = []
+        phenomena = []
+        phenomenon_times = []
+        result_times = []
+        values = []
+        uoms = []
+
+        for mo in parsed_response.observations:
+            fois.append(mo.featureOfInterest)
+            procedures.append(mo.procedure)
+            phenomena.append(mo.observedProperty)
+            phenomenon_times.append(mo.phenomenonTime)
+            result_times.append(mo.resultTime)
+            values.append(mo.get_result().value)
+            uoms.append(mo.get_result().uom)
+
+        return pd.DataFrame({'site': fois, 'procedure': procedures, 'phenomenon' : phenomena, 'phenomenon_time': phenomenon_times, 'result_time': result_times, 'value': values, 'unit': uoms})
+
+    def _create_df_waterml(self, parsed_response):
+        """
+        Save observation data in a DataFrame using response format http://www.opengis.net/waterml/2.0
+        """
+
+        fois = []
+        procedures = []
+        phenomena = []
+        time_stamps = []
+        values = []
+        uoms = []
+
+        for mo in parsed_response.observations:
+            for point in mo.get_result().points:
+                fois.append(mo.featureOfInterest)
+                procedures.append(mo.procedure)
+                phenomena.append(mo.observedProperty)
+                time_stamps.append(point.datetime)
+                values.append(point.value)
+                uoms.append(mo.get_result().defaultTVPMetadata.uom)
+
+        return pd.DataFrame({'site': fois, 'procedure': procedures, 'phenomenon' : phenomena, 'time_stamp': time_stamps, 'value': values, 'unit': uoms})
 
 class SOSGetFeatureOfInterestResponse(object):
-    """ The base response type from SOS2.0. Container for OM_Observation
-    objects.
-    """
+
     def __init__(self, element):
         feature_data = element.findall(
             nspath_eval("sos:featureMember/wml2:MonitoringPoint", namespaces))
