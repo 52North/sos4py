@@ -17,11 +17,13 @@ Features
 --------
 *   Allows connection to an SOS service using OWSLib.
 
-*   Explore and summarize service capabilities, sensor metadata, offerings, observed properties, and available phenomena.
+*   Explore and summarize service capabilities, sensor metadata, offerings, observed properties, available phenomena and features of interest.
 
 *   Query requests to an SOS service for Get Data Availability.
 
-*   Query requests to an SOS service for Get Feature of Interest.
+*   Query requests to an SOS service for getting observation data.
+
+*   Query requests to an SOS service for getting observation site data.
 
 Usage
 -----
@@ -71,6 +73,8 @@ Usage
   ``sosOfferings()`` Explore offerings section of an SOS v2.0 capabilities document. This function queries the offerings and returns the data as a pandas Series dataframe. 
 
   ``sosPhenomena()`` Queries a SOS v2.0 for all its phenomena. Returns a list of the phenomena ids.
+  
+  ``sosFeaturesOfInterest()`` Queries a SOS v2.0 for all its features of interest. Returns a list of the feature of interest ids.
 
  *Examples*
 
@@ -127,51 +131,60 @@ Usage
       featuresOfInterest=['http://www.52north.org/test/featureOfInterest/6'])``
 
 
-**Get Feature of Interest function:**        
+
+**Get sites function:**        
  *Description*
-  Method to retrieve feature(s) of interest from an SOS. The result is <class 'bytes'>.
+  Method to retrieve sites from an SOS. The result is a GeoDataFrame.
 
  *Usage*
 
- ``def get_feature_of_interest(self, responseFormat=None, featureOfInterest=None, method=None, **kwargs)``
+ ``def get_sites(self, include_phenomena=False)``
       
  *Parameters*
 
-    responseFormat : str
-      Xml schema path.
-
-    featureOfInterest : str
-      Query the data only for a specific feature of interest.
-
-    method : str
-      'Get' or 'Post' request parameter.
+    include_phenomena : boolean, optional
+      Whether or not flags for the existance of phenomenona (e.g. water temperature) should be included (default is False)
 
 
  *Examples*
 
-      ``service.get_feature_of_interest()``
+      ``service.get_sites()``
       
-      ``service.get_feature_of_interest(featureOfInterest='foi_name')``
+      ``service.get_sites(include_phenomena = True)``
       
+
+**Get data function:**        
+ *Description*
+  Method to get observation data from an SOS. The result is a DataFrame.
+
+ *Usage*
+
+ ``def get_data(self, sites=None, phenomena=None, procedures=None, begin=None, end=None)``
       
-      ``from owslib.etree import etree``
+ *Parameters*
+
+    sites : non-empty list of str, optional
+       observation sites/sensor locations
+       
+    phenomena : non-empty list of str, optional
+       phenomena, e.g. water temperature
+       
+    procedures : non-empty list of str, optional
+       measurement procedures of the observation, e.g. measurements in 2 m water depth
+       
+    begin : str, optional if end is not provided
+       begin of time period in the form 'YYYY-MM-DDThh:mm:ssZ', e.g. '2020-01-01T10:00:00Z'
+       
+    end : str, optional if begin is not provided
+       end of time period in the form 'YYYY-MM-DDThh:mm:ssZ', e.g. '2020-01-02T10:00:00Z'  
+
+  It is recommended to provide at least one of sites, phenomena or procedures. Otherwise the request may take very long.
+
+ *Examples*
+
+      ``service.get_data()``
       
-      ``from sos4py.main import connection_sos``
-      
-      ``from sos4py.sos_2_0_0 import SOSGetFeatureOfInterestResponse``
-      
-        
-      ``service = connection_sos("https://fluggs.wupperverband.de/sos2/service")``
-      
-      ``response = service.get_feature_of_interest()``
-      
-      ``xml_tree = etree.fromstring(response)``
-      
-      ``parsed_response = SOSGetFeatureOfInterestResponse(xml_tree)``
-      
-      ``name = parsed_response.features[0].name``
-      
-      ``geometry = parsed_response.features[0].get_geometry()``
+      ``service.get_data(sites=['Sensor location 1'],phenomena=['water temperature','salinity'])``
       
       
 
