@@ -43,8 +43,8 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/52North/sos4py',
-    download_url='https://github.com/52North/sos4py/archive/v0.2.0.tar.gz',
-    version='0.2.0',
+    download_url='https://github.com/52North/sos4py/archive/v0.3.0.tar.gz',
+    version='0.3.0',
     zip_safe=False,
 
 )
