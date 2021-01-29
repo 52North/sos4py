@@ -28,8 +28,11 @@ Usage
 **Connecting to an SOS service:**
 
  *Description*
+ 
   Base class of a connection to a Sensor Observation Service. The result is class object SensorObservationService_2_0_0(object) of the OWSLib (<https://github.com/geopython/OWSLib/blob/master/owslib/swe/observation/sos200.py>)
+  
  *Usage*
+ 
      ``def connection_sos(url,
      xml=None,
      username=None,
@@ -53,13 +56,16 @@ Usage
     ``service = sos4py('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
 
 **Get capabilities functions (summaries):**
+
  *Description*
+ 
   Construction class sos_2_0_0. Implements the the return of the function *connection_sos()* as input. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
 
  *Usage*
      ``class sos_2_0_0(self, url, version, xml=None, username=None, password=None):``
 
  *Methods*
+ 
   ``sosServiceIdentification()`` The identification section of a SOS v2.0 capabilities document. This function queries the identification metadata available and returns the data as a pandas Series dataframe. 
 
   ``sosProvider()`` The provider section of an SOS v2.0 capabilities document. This function queries the provider metadata available and returns the data as a pandas Series dataframe.     
@@ -89,8 +95,10 @@ Usage
     ``service.phenomena()``
 
 
-**Get Data Availability function:**        
+**Get Data Availability function:**   
+
  *Description*
+ 
   Base class of a connection to a Sensor Observation Service. The result is class object SensorObservationService_2_0_0(object) of the OWSLib (<https://github.com/geopython/OWSLib/blob/master/owslib/swe/observation/sos200.py>)
 
  *Usage*
@@ -128,8 +136,10 @@ Usage
 
 
 
-**Get sites function:**        
+**Get sites function:**   
+
  *Description*
+ 
   Method to retrieve sites from an SOS. The result is a GeoDataFrame.
 
  *Usage*
@@ -149,8 +159,10 @@ Usage
       ``service.get_sites(include_phenomena = True)``
       
 
-**Get data function:**        
+**Get data function:**   
+
  *Description*
+ 
   Method to get observation data from an SOS. The result is a DataFrame.
 
  *Usage*
@@ -182,7 +194,8 @@ Usage
       
       ``service.get_data(sites=['Sensor location 1'],phenomena=['water temperature','salinity'])``
       
-     ### Funding organizations/projects
+Funding organizations/projects
+-------
 
 The development of sos4py was supported by several organizations and projects. Among other we would like to thank the following organisations and project
 
@@ -194,7 +207,4 @@ The development of sos4py was supported by several organizations and projects. A
 Credits
 -------
 
-This package was created with Cookiecutter and the `audreyr/cookiecutter-pypackage` project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+This package was created with <a target="_blank" href="https://github.com/audreyr/cookiecutter">Cookiecutter</a> and the <a target="_blank" href="https://github.com/audreyr/cookiecutter-pypackage">audreyr/cookiecutter-pypackage</a> project template. 
