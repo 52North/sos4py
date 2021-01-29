@@ -53,16 +53,17 @@ Usage
 
     ``from sos4py.main import connection_sos``
     
-    ``service = sos4py('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
+    ``service = connection_sos('http://sensorweb.demo.52north.org/52n-sos-webapp/sos/kvp')``
 
 **Get capabilities functions (summaries):**
 
  *Description*
  
-  Construction class sos_2_0_0. Implements the the return of the function *connection_sos()* as input. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
+  Construction class sos_2_0_0. Implements the return of the function *connection_sos()* as input. The methods of the class can be used for metadata retrieval of sensors, and observation data queries.
 
  *Usage*
-     ``class sos_2_0_0(self, url, version, xml=None, username=None, password=None):``
+ 
+  ``class sos_2_0_0(self, url, version, xml=None, username=None, password=None):``
 
  *Methods*
  
@@ -130,10 +131,8 @@ Usage
 
       ``service.get_data_availability()``
 
-
       ``service.get_data_availability(procedures=['http://www.52north.org/test/procedure/6'], 
       featuresOfInterest=['http://www.52north.org/test/featureOfInterest/6'])``
-
 
 
 **Get sites function:**   
