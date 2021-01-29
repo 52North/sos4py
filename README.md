@@ -1,11 +1,6 @@
-======
-sos4py
-======
-
-
-.. image:: https://img.shields.io/pypi/v/sos4py.svg
-        :target: https://pypi.python.org/pypi/sos4py
-
+# sos4py
+        
+<a target="_blank" href="https://pypi.python.org/pypi/sos4py/"><img alt="version" src="https://img.shields.io/pypi/v/sos4py.svg"/></a>
 
 sos4py is a convenience layer for Python environment to access services, extract data, and allow querying from SOS instances.
 
@@ -31,6 +26,7 @@ Usage
 **EXAMPLES OF THE PACKAGE CAN BE SEEN:**: https://github.com/52North/sos4py/tree/master/examples
 
 **Connecting to an SOS service:**
+
  *Description*
   Base class of a connection to a Sensor Observation Service. The result is class object SensorObservationService_2_0_0(object) of the OWSLib (<https://github.com/geopython/OWSLib/blob/master/owslib/swe/observation/sos200.py>)
  *Usage*
@@ -186,12 +182,19 @@ Usage
       
       ``service.get_data(sites=['Sensor location 1'],phenomena=['water temperature','salinity'])``
       
-      
+     ### Funding organizations/projects
+
+The development of sos4py was supported by several organizations and projects. Among other we would like to thank the following organisations and project
+
+| Project/Logo | Description |
+| :-------------: | :------------- |
+| <a target="_blank" href="https://www.bmvi.de/"><img alt="BMVI" align="middle" width="100" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/bmvi-logo-en.png"/></a><a target="_blank" href="https://www.bmvi.de/DE/Themen/Digitales/mFund/Ueberblick/ueberblick.html"><img alt="mFund" align="middle" width="100" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/mFund.jpg"/></a><a target="_blank" href="http://wacodis.fbg-hsbo.de/"><img alt="WaCoDis - Water management Copernicus services for the determination of substance inputs into waters and dams within the framework of environmental monitoring" align="middle" width="126" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/wacodis-logo.png"/></a> | The development of this version of sos4py was supported by the <a target="_blank" href="https://www.bmvi.de/"> German Federal Ministry of of Transport and Digital Infrastructure</a> research project <a target="_blank" href="http://wacodis.fbg-hsbo.de/">WaCoDis</a> (co-funded by the German Federal Ministry of Transport and Digital Infrastructure, programme mFund) |
+| <a target="_blank" href="https://bmbf.de/"><img alt="BMBF" align="middle" width="100" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/bmbf_logo_neu_eng.png"/></a><a target="_blank" href="https://www.fona.de/"><img alt="FONA" align="middle" width="100" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/fona.png"/></a><a target="_blank" href="https://colabis.de/"><img alt="Multidisciplinary data acquisition as the key for a globally applicable water resource management (MuDak-WRM)" align="middle" width="100" src="https://raw.githubusercontent.com/52North/sos/develop/spring/views/src/main/webapp/static/images/funding/mudak_wrm_logo.png"/></a> | The development of this version of sos4py was supported by the <a target="_blank" href="https://www.bmbf.de/"> German Federal Ministry of Education and Research</a> research project <a target="_blank" href="http://www.mudak-wrm.kit.edu/">MuDak-WRM</a> (co-funded by the German Federal Ministry of Education and Research, programme FONA) |
 
 Credits
 -------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+This package was created with Cookiecutter and the `audreyr/cookiecutter-pypackage` project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
