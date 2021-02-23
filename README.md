@@ -14,7 +14,7 @@ Features
 
 *   Explore and summarize service capabilities, sensor metadata, offerings, observed properties, available phenomena and features of interest.
 
-*   Query requests to an SOS service for Get Data Availability.
+*   Query requests to an SOS service for getting Data Availability.
 
 *   Query requests to an SOS service for getting observation data.
 
@@ -184,7 +184,7 @@ Usage
     end : str, optional if begin is not provided
        end of time period in the form 'YYYY-MM-DDThh:mm:ssZ', e.g. '2020-01-02T10:00:00Z'  
 
-  It is recommended to provide at least one of sites, phenomena or procedures. Otherwise the request may take very long.
+  It is recommended to provide at least one of sites, phenomena or procedures. Otherwise, the request may take very long.
 
  *Examples*
 
@@ -195,7 +195,7 @@ Usage
 Funding organizations/projects
 -------
 
-The development of sos4py was supported by several organizations and projects. Among other we would like to thank the following organisations and project
+The development of sos4py was supported by several organizations and projects. Among other, we would like to thank the following organisations and project
 
 | Project/Logo | Description |
 | :-------------: | :------------- |
