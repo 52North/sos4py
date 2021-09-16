@@ -16,6 +16,7 @@ from owslib.swe.observation.waterml2 import MeasurementTimeseriesObservation
 from owslib.swe.observation.om import MeasurementObservation
 from owslib.etree import etree
 from owslib import ows
+from urllib.parse import urlencode
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
@@ -139,7 +140,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
             for kw in kwargs:
                 request[kw] = kwargs[kw]
 
-        request_gda = openURL(base_url, request, method, username=self.username, password=self.password, **url_kwargs).read()
+        data = urlencode(request)
+        request_gda = openURL(base_url, data, method, username=self.username, password=self.password, **url_kwargs).read()
         gda = etree.fromstring(request_gda)
 
         if gda.tag == nspath_eval("ows:ExceptionReport", namespaces):
@@ -203,7 +205,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
             for kw in kwargs:
                 request[kw] = kwargs[kw]
 
-        response = openURL(base_url, request, method,
+        data = urlencode(request)
+        response = openURL(base_url, data, method,
                                username=self.username, password=self.password, **url_kwargs).read()
         try:
             tr = etree.fromstring(response)
@@ -330,7 +333,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
             for kw in kwargs:
                 request[kw] = kwargs[kw]
 
-        response = openURL(base_url, request, method, username=self.username, password=self.password, **url_kwargs).read()
+        data = urlencode(request)
+        response = openURL(base_url, data, method, username=self.username, password=self.password, **url_kwargs).read()
 
         try:
             tr = etree.fromstring(response)
