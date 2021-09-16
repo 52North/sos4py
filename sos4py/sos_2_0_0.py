@@ -446,8 +446,15 @@ class sos_2_0_0(SensorObservationService_2_0_0):
 class SOSGetFeatureOfInterestResponse(object):
 
     def __init__(self, element):
-        feature_data = element.findall(
-            nspath_eval("sos:featureMember/wml2:MonitoringPoint", namespaces))
+        feature_data = []
+        # add WaterML MonitoringPoints
+        mp = element.findall(nspath_eval("sos:featureMember/wml2:MonitoringPoint", namespaces))
+        if mp is not None:
+            feature_data.extend(mp)
+         # add SamplingFeature SpatialSamplingFeature
+        ssf = element.findall( nspath_eval("sos:featureMember/sams:SF_SpatialSamplingFeature", namespaces))
+        if ssf is not None:
+            feature_data.extend(ssf)
         self.features = []
         for feature in feature_data:
             parsed_feature = FeatureOfInterest(feature)
