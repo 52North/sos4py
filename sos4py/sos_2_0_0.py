@@ -500,5 +500,6 @@ class FeatureOfInterest(object):
             except Exception:
                 raise ValueError("Error parsing coordinates value")
             self.geometry = tuple((float(y),float(x)))
-
+        else:
+            self.geometry = None
             # TODO: write parsers for different geometry types
