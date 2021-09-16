@@ -238,8 +238,9 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         fois = []
         points = []
         for foi in parsed_response.features:
-            fois.append(foi.name)
-            points.append(Point(foi.get_geometry()[1],foi.get_geometry()[0])) # Point expects (x, y)
+            if foi.get_geometry() is not None:
+                fois.append(foi.name if foi.name is not None else foi.id)
+                points.append(Point(foi.get_geometry()[1],foi.get_geometry()[0])) # Point expects (x, y)
 
         crs = pyproj.CRS.from_user_input(int(parsed_response.features[0].get_srs().split("/")[-1]))
         sites = gpd.GeoDataFrame({'site_name': fois, 'geometry': gpd.GeoSeries(points)},  crs=crs)
