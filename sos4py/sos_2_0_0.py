@@ -238,8 +238,9 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         fois = []
         points = []
         for foi in parsed_response.features:
-            fois.append(foi.name)
-            points.append(Point(foi.get_geometry()[1],foi.get_geometry()[0])) # Point expects (x, y)
+            if foi.get_geometry() is not None:
+                fois.append(foi.name if foi.name is not None else foi.id)
+                points.append(Point(foi.get_geometry()[1],foi.get_geometry()[0])) # Point expects (x, y)
 
         crs = pyproj.CRS.from_user_input(int(parsed_response.features[0].get_srs().split("/")[-1]))
         sites = gpd.GeoDataFrame({'site_name': fois, 'geometry': gpd.GeoSeries(points)},  crs=crs)
@@ -446,8 +447,15 @@ class sos_2_0_0(SensorObservationService_2_0_0):
 class SOSGetFeatureOfInterestResponse(object):
 
     def __init__(self, element):
-        feature_data = element.findall(
-            nspath_eval("sos:featureMember/wml2:MonitoringPoint", namespaces))
+        feature_data = []
+        # add WaterML MonitoringPoints
+        mp = element.findall(nspath_eval("sos:featureMember/wml2:MonitoringPoint", namespaces))
+        if mp is not None:
+            feature_data.extend(mp)
+         # add SamplingFeature SpatialSamplingFeature
+        ssf = element.findall( nspath_eval("sos:featureMember/sams:SF_SpatialSamplingFeature", namespaces))
+        if ssf is not None:
+            feature_data.extend(ssf)
         self.features = []
         for feature in feature_data:
             parsed_feature = FeatureOfInterest(feature)
@@ -493,5 +501,6 @@ class FeatureOfInterest(object):
             except Exception:
                 raise ValueError("Error parsing coordinates value")
             self.geometry = tuple((float(y),float(x)))
-
+        else:
+            self.geometry = None
             # TODO: write parsers for different geometry types
