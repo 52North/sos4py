@@ -22,7 +22,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 import pyproj
 import inspect
-from .util import get_namespaces, nspv, TimePeriod, parseGDAReferencedElement, gda_member, check_list_param
+from .util import get_namespaces, nspv, gda_member, gda2_member, check_list_param, check_gda_references
 
 namespaces = get_namespaces()
 
@@ -143,13 +143,17 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         data = urlencode(request)
         request_gda = openURL(base_url, data, method, username=self.username, password=self.password, **url_kwargs).read()
         gda = etree.fromstring(request_gda)
-
         if gda.tag == nspath_eval("ows:ExceptionReport", namespaces):
             raise ows.ExceptionReport(gda)
 
+        final = None
         gdaMembers = gda.findall(nspath_eval("gda:dataAvailabilityMember", namespaces))
-        final = list(map(gda_member, gdaMembers))
-        return(final)
+        if gdaMembers is None or len(gdaMembers) == 0:  
+            gdaMembers = gda.findall(nspath_eval("gda2:dataAvailabilityMember", namespaces))
+            final = list(map(gda2_member, gdaMembers))
+        else:
+            final = list(map(gda_member, gdaMembers))
+        return(check_gda_references(final))
 
     def get_feature_of_interest(self, featuresOfInterest=None, observedProperties=None, procedures=None, responseFormat=None, method=None, **kwargs):
         """Performs "GetFeatureOfInterest" request
