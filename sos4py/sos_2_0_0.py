@@ -16,7 +16,7 @@ from owslib.swe.observation.waterml2 import MeasurementTimeseriesObservation
 from owslib.swe.observation.om import MeasurementObservation
 from owslib.etree import etree
 from owslib import ows
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
@@ -107,6 +107,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         except StopIteration:
             base_url = self.url
 
+        base_url = self._fix_url_base(base_url)
+
         #Mandatory request parameters
         request = {'service': 'SOS', 'version':"2.0.0", 'request': 'GetDataAvailability'}
 
@@ -175,6 +177,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         method = method or 'Get'
         methods = self.get_operation_by_name('GetFeatureOfInterest').methods
         base_url = [m['url'] for m in methods if m['type'] == method][0]
+
+        base_url = self._fix_url_base(base_url)
 
         request = {'service': 'SOS', 'version': self.version, 'request': 'GetFeatureOfInterest'}
 
@@ -298,6 +302,8 @@ class sos_2_0_0(SensorObservationService_2_0_0):
         methods = self.get_operation_by_name('GetObservation').methods
         base_url = [m['url'] for m in methods if m['type'] == method][0]
 
+        base_url = self._fix_url_base(base_url)
+
         request = {'service': 'SOS', 'version': self.version, 'request': 'GetObservation'}
 
         if responseFormat is not None:
@@ -392,6 +398,15 @@ class sos_2_0_0(SensorObservationService_2_0_0):
             response_format = 'http://www.opengis.net/waterml/2.0'
 
         return self._create_obs_data_frame(parsed_response, response_format)
+
+    def _fix_url_base(self, base_url):
+        parsed_url = urlparse(base_url)
+        self_parsed_url = urlparse(self.url)
+
+        if parsed_url.netloc != self_parsed_url.netloc:
+            base_url = parsed_url._replace(netloc=self_parsed_url.netloc).geturl()
+        
+        return base_url
 
     def _create_obs_data_frame(self, parsed_response=None, response_format=None):
 
@@ -498,7 +513,11 @@ class FeatureOfInterest(object):
         if self.shape is not None:
             self.srs = testXMLAttribute(self.shape.find(nspv("ns:Point/ns:pos")), "srsName")
             # Coordinates are saved as <ns:pos srsName="">y x</ns:pos> or <ns:pos srsName="">latitude longitude</ns:pos>, respectively
-            y, x = testXMLValue(self.shape.find(nspv("ns:Point/ns:pos"))).split(" ")
+            geom_node = testXMLValue(self.shape.find(nspv("ns:Point/ns:pos")))
+            if geom_node is None:
+                self.geometry = None
+                return
+            y, x = geom_node.split(" ")
             try:
                 x = float(x)
                 y = float(y)
